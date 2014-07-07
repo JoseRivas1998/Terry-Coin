@@ -22,6 +22,7 @@ public class Player {
 	private Rectangle bounds;
 	private JumpButton lJ, rJ;
 	private SprintButton lS, rS;
+	float yVel;
 	
 	private TextureRegion[] rj = {
 		new TextureRegion(new Texture(Gdx.files.internal(path+"jump-right.png")))	
@@ -102,6 +103,7 @@ public class Player {
 		this.move = Movement.IDLE;
 		
 		sprite.setPosition(Game.WIDTH / 2 - 16, Game.HEIGHT * .75f);
+		yVel = 0;
 	}
 	
 	@SuppressWarnings("incomplete-switch")
@@ -110,21 +112,21 @@ public class Player {
 		case Desktop: handleDeskTopInput(); break;
 		case Android: handleTouch(); break;
 		}
-		if(!bounds.overlaps(g.getBounds())) {
-			sprite.translateY(-5);
-			this.move = Movement.JUMP;
-		}
+		sprite.translateY(yVel);
 		bounds.set(sprite.getX(), sprite.getY(), 64, 64);
 	}
 	
 	public void handleDeskTopInput() {
 		this.move = Movement.IDLE;
-		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
-			if(sprite.getBoundingRectangle().overlaps(g.getBounds())) {
+		if(bounds.overlaps(g.getBounds())) {
+			yVel = 0;
+			if (Gdx.input.isKeyPressed(Keys.SPACE)) {
+				this.move = Movement.JUMP;
 				Game.res.getSound("jump").play();
-				sprite.setY(Game.HEIGHT * .5f);
+				yVel = 20;
 			}
-			this.move = Movement.JUMP;
+		} else {
+			yVel--;
 		}
 		if (Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT))   {
 			if (this.move == Movement.IDLE)
@@ -157,7 +159,7 @@ public class Player {
 				xVel = 0;
 			}
 		}
-		if((sprite.getX() <= 0 && this.dir == Direction.LEFT) || ((sprite.getX() + 16) >= Game.WIDTH && this.dir == Direction.RIGHT)) {
+		if((sprite.getX() <= 0 && this.dir == Direction.LEFT) || ((sprite.getX() + 48) >= Game.WIDTH && this.dir == Direction.RIGHT)) {
 			xVel = 0;
 		}
 		sprite.translateX(xVel);
@@ -165,54 +167,48 @@ public class Player {
 	
 	public void handleTouch() {
 		this.move = Movement.IDLE;
-		if(Gdx.input.isTouched()) {
-			if (c.getBounds().overlaps(lJ.getBounds())) {
-				System.out.println("left touched");
-				if(sprite.getBoundingRectangle().overlaps(g.getBounds())) {
-					Game.res.getSound("jump").play();
-					sprite.setY(Game.HEIGHT * .5f);
-				}
-				this.move = Movement.JUMP;
-			}
-			if(c.getBounds().overlaps(rJ.getBounds())) {
-				System.out.println("Right touched");
-				if(sprite.getBoundingRectangle().overlaps(g.getBounds())) {
-					Game.res.getSound("jump").play();
-					sprite.setY(Game.HEIGHT * .5f);
-				}
-				this.move = Movement.JUMP;
-			}
-			if (Gdx.input.getX() < Game.WIDTH * .5)   {
-				if (this.move == Movement.IDLE)
-				{
-					this.move = Movement.WALK;
-					if(c.getBounds().overlaps(lS.getBounds())) {
-						xVel = -5;
-					} else {
-						xVel = -3;
-					}
-				}
-				this.dir = Direction.LEFT;
-			} else if (Gdx.input.getX() > Game.WIDTH * .5) {
-				if (this.move == Movement.IDLE)
-				{
-					this.move = Movement.WALK;
-					if(c.getBounds().overlaps(rS.getBounds())) {
-						xVel = 5;
-					} else {
-						xVel = 3;
-					}
-				}
-				this.dir = Direction.RIGHT;
-			} 
-		} else {
 			if(bounds.overlaps(g.getBounds())) {
-				this.move = Movement.IDLE;
-				xVel = 0;
+				yVel = 0;
+				if (c.getBounds().overlaps(lJ.getBounds()) || c.getBounds().overlaps(rJ.getBounds())) {
+					this.move = Movement.JUMP;
+					Game.res.getSound("jump").play();
+					yVel = 20;
+				}
 			} else {
-				this.move = Movement.JUMP;
-				xVel = 0;
+				yVel--;
 			}
+			if(Gdx.input.isTouched()) {
+				if (Gdx.input.getX() < Game.WIDTH * .5)   {
+					if (this.move == Movement.IDLE)
+					{
+						this.move = Movement.WALK;
+						if(c.getBounds().overlaps(lS.getBounds())) {
+							xVel = -7;
+						} else {
+							xVel = -5;
+						}
+					}
+					this.dir = Direction.LEFT;
+				} else if (Gdx.input.getX() > Game.WIDTH * .5) {
+					if (this.move == Movement.IDLE)
+					{
+						this.move = Movement.WALK;
+						if(c.getBounds().overlaps(rS.getBounds())) {
+							xVel = 7;
+						} else {
+							xVel = 5;
+						}
+					}
+					this.dir = Direction.RIGHT;
+				}
+			} else {
+				if(bounds.overlaps(g.getBounds())) {
+					this.move = Movement.IDLE;
+					xVel = 0;
+				} else {
+					this.move = Movement.JUMP;
+					xVel = 0;
+				}
 		}
 		if((sprite.getX() <= 0 && this.dir == Direction.LEFT) || ((bounds.x + bounds.width) >= Game.WIDTH && this.dir == Direction.RIGHT)) {
 			xVel = 0;

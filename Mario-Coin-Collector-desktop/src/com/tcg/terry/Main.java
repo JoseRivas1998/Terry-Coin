@@ -11,8 +11,6 @@ public class Main {
 		cfg.useGL20 = false;
 		cfg.width = 1280;
 		cfg.height = 720;
-		cfg.x = 1;
-		cfg.y = 1;
 		if(!Game.debug) cfg.fullscreen = true;
 		
 		new LwjglApplication(new Game(), cfg);
