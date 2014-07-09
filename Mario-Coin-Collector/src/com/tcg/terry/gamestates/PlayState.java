@@ -2,6 +2,7 @@ package com.tcg.terry.gamestates;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -16,6 +17,7 @@ import com.tcg.terry.entities.Cursor;
 import com.tcg.terry.entities.Flower;
 import com.tcg.terry.entities.Ground;
 import com.tcg.terry.entities.JumpButton;
+import com.tcg.terry.entities.MenuButton;
 import com.tcg.terry.entities.Player;
 import com.tcg.terry.entities.SprintButton;
 import com.tcg.terry.main.Game;
@@ -34,6 +36,7 @@ public class PlayState extends GameState {
 	private Vector2 pPos, cPos, iPos;
 	private JumpButton lJ, rJ;
 	private SprintButton lS, rS;
+	private MenuButton mb;
 	private Cursor in;
 	private Array<Flower> f;
 	private Array<Cloud> cls;
@@ -52,6 +55,12 @@ public class PlayState extends GameState {
 		timer = new Timer(121);
 		cls = new Array<Cloud>();
 		font = new BitmapFont(Game.fontFile, Game.fontImage, false);
+		font.setScale(1); 
+		float mbW = font.getBounds("Menu").width + 10;
+		float mbH = font.getBounds("Menu").height * 3;
+		float mbX = Game.WIDTH - mbW;
+		float mbY = Game.HEIGHT - mbH;
+		Rectangle mbR = new Rectangle(mbX, mbY, mbW, mbH);
 		float h1 = font.getBounds("Time Left: " + Long.toString(timer.getCurrentTime()) + " seconds").height; 
 		float h2 = font.getBounds("Coins: ").height;
 		float h = h1 + h2;
@@ -59,7 +68,7 @@ public class PlayState extends GameState {
 		text = new Rectangle(0, Game.HEIGHT - h, w, h);
 		for(int i = 0; i < 20; i++) {
 			cls.add(new Cloud(MathUtils.random(Game.WIDTH), MathUtils.random(Game.HEIGHT * .3f, Game.HEIGHT)));
-			while((text.overlaps(cls.get(i).bounds()))) {
+			while((text.overlaps(cls.get(i).bounds())) || (mbR.overlaps(cls.get(i).bounds()))) {
 				cls.get(i).setPosition(MathUtils.random(Game.WIDTH), MathUtils.random(Game.HEIGHT * .3f, Game.HEIGHT));
 			}
 		}
@@ -76,10 +85,8 @@ public class PlayState extends GameState {
 		switch(Gdx.app.getType()) {
 		case Desktop: 
 			p = new Player(g, null, null, in, null, null);
-			font.setScale(1); 
 			break;
 		case Android: 
-			font.setScale(1.5f);
 			lS = new SprintButton(Game.WIDTH * .1f, Game.HEIGHT * .2f);
 			rS = new SprintButton(Game.WIDTH * .8f, Game.HEIGHT * .2f);
 			lJ = new JumpButton(lS.getBounds().x, lS.getBounds().y - lS.getBounds().height * 2);
@@ -87,6 +94,7 @@ public class PlayState extends GameState {
 			p = new Player(g, lJ, rJ, in, lS, rS);
 			break;
 		}
+		mb = new MenuButton(mbX, mbY);
 		c = new Coin(p, MathUtils.random(Game.WIDTH), timer);
 		sr = new ShapeRenderer();
 		Game.res.getMusic("bgm").play();
@@ -100,6 +108,7 @@ public class PlayState extends GameState {
 	private long totalCoins;
 	@Override
 	public void update(float dt) {
+		handleInput();
 		timer.update(dt);
 		in.update();
 		p.update(dt);
@@ -154,6 +163,7 @@ public class PlayState extends GameState {
 		case Desktop:
 			break;
 		}
+		mb.draw();
 		if(Game.debug) debugDraw();
 	}
 	
@@ -206,7 +216,9 @@ public class PlayState extends GameState {
 
 	@Override
 	public void handleInput() {
-
+		if(in.getBounds().overlaps(mb.getBounds()) || Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+			gsm.setState(gsm.MENU);
+		}
 	}
 
 	@Override

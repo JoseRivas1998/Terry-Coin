@@ -174,11 +174,9 @@ public class MenuState extends GameState {
 	
 	public void desktop() {
 		if(c.getBounds().overlaps(p)) {
-			Game.res.getMusic("title").stop();
 			gsm.setState(gsm.PLAY);
 		}
 		if(c.getBounds().overlaps(co)) {
-			Game.res.getMusic("title").stop();
 			gsm.setState(gsm.CONTROLS);
 		}
 		if(c.getBounds().overlaps(d)) {

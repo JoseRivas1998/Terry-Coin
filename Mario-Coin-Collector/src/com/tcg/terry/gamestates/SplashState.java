@@ -1,5 +1,6 @@
 package com.tcg.terry.gamestates;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
@@ -90,8 +91,7 @@ public class SplashState extends GameState {
 
 	@Override
 	public void handleInput() {
-		if(Gdx.input.isTouched() || Gdx.input.isKeyPressed(Keys.ANY_KEY)) {
-			Game.res.getMusic("splash").stop();
+		if(Gdx.input.isTouched() || (Gdx.input.isKeyPressed(Keys.ANY_KEY) && Gdx.app.getType() == ApplicationType.Desktop)) {
 			gsm.setState(gsm.MENU);
 		}
 

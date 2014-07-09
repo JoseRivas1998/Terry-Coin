@@ -145,11 +145,9 @@ public class GameOverState extends GameState {
 	@Override
 	public void handleInput() {
 		if(m.overlaps(cu.getBounds())) {
-			Game.res.getMusic("gos").stop();
 			gsm.setState(gsm.MENU);
 		}
 		if(p.overlaps(cu.getBounds())) {
-			Game.res.getMusic("gos").stop();
 			gsm.setState(gsm.PLAY);
 		}
 	}

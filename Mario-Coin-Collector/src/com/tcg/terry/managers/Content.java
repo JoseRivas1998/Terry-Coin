@@ -98,6 +98,17 @@ public class Content {
 		sounds.clear();
 	}
 	
+	public void stopAllSound() {
+		for(Object o : music.values()) {
+			Music music = (Music) o;
+			music.stop();
+		}
+		for(Object o : sounds.values()) {
+			Sound sound = (Sound) o;
+			sound.stop();
+		}
+	}
+	
 }
 
 

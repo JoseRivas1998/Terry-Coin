@@ -179,7 +179,6 @@ public class ControlsState extends GameState {
 	@Override
 	public void handleInput() {
 		if(m.overlaps(c.getBounds())) {
-			Game.res.getMusic("controls").stop();
 			gsm.setState(gsm.MENU);
 		}
 

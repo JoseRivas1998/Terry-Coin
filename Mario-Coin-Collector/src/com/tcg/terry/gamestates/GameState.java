@@ -1,5 +1,6 @@
 package com.tcg.terry.gamestates;
 
+import com.tcg.terry.main.Game;
 import com.tcg.terry.managers.GameStateManager;
 
 public abstract class GameState {
@@ -10,6 +11,7 @@ public abstract class GameState {
 	
 	public GameState(GameStateManager gsm) {
 		this.gsm = gsm;
+		Game.res.stopAllSound();
 		init();
 	}
 	
