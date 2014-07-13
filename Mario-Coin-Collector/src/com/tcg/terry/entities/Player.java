@@ -70,14 +70,6 @@ public class Player {
 
 	Direction dir;
 	Movement move;
-
-	public Player(Direction dir) {
-		this.dir = dir;
-	}
-	
-	public Player(Movement move) {
-		this.move = move;
-	}
 	
 	public Player(Ground g, JumpButton lJ, JumpButton rJ, Cursor c, SprintButton lS, SprintButton rS) {
 		sprite = new Sprite();
@@ -159,8 +151,11 @@ public class Player {
 				xVel = 0;
 			}
 		}
-		if((sprite.getX() <= 0 && this.dir == Direction.LEFT) || ((sprite.getX() + 48) >= Game.WIDTH && this.dir == Direction.RIGHT)) {
-			xVel = 0;
+		if((sprite.getX() <= 0 && this.dir == Direction.LEFT)) {
+			sprite.setX(Game.WIDTH);
+		}
+		if((sprite.getX() + 48) >= Game.WIDTH && this.dir == Direction.RIGHT) {
+			sprite.setX(0);
 		}
 		sprite.translateX(xVel);
 	}
@@ -210,8 +205,11 @@ public class Player {
 					xVel = 0;
 				}
 		}
-		if((sprite.getX() <= 0 && this.dir == Direction.LEFT) || ((bounds.x + bounds.width) >= Game.WIDTH && this.dir == Direction.RIGHT)) {
-			xVel = 0;
+		if((sprite.getX() <= 0 && this.dir == Direction.LEFT)) {
+			sprite.setX(Game.WIDTH);
+		}
+		if((sprite.getX() + 48) >= Game.WIDTH && this.dir == Direction.RIGHT) {
+			sprite.setX(0);
 		}
 		sprite.translateX(xVel);
 	}

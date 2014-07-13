@@ -3,6 +3,7 @@ package com.tcg.terry.gamestates;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -56,19 +57,18 @@ public class PlayState extends GameState {
 		cls = new Array<Cloud>();
 		font = new BitmapFont(Game.fontFile, Game.fontImage, false);
 		font.setScale(1); 
-		float mbW = font.getBounds("Menu").width + 10;
-		float mbH = font.getBounds("Menu").height * 3;
-		float mbX = Game.WIDTH - mbW;
-		float mbY = Game.HEIGHT - mbH;
-		Rectangle mbR = new Rectangle(mbX, mbY, mbW, mbH);
-		float h1 = font.getBounds("Time Left: " + Long.toString(timer.getCurrentTime()) + " seconds").height; 
+		float seconds = timer.getCurrentTime();
+		float minutes = seconds / 60;
+		float remainingSeconds = seconds % 60;
+		String timeSQ = "Time Left: " +(int) minutes + " minutes and " + (int) remainingSeconds + " seconds.";
+		float h1 = font.getBounds(timeSQ).height;
 		float h2 = font.getBounds("Coins: ").height;
 		float h = h1 + h2;
 		float w = font.getBounds("Time Left: " + Long.toString(timer.getCurrentTime()) + " seconds").width; 
 		text = new Rectangle(0, Game.HEIGHT - h, w, h);
 		for(int i = 0; i < 20; i++) {
 			cls.add(new Cloud(MathUtils.random(Game.WIDTH), MathUtils.random(Game.HEIGHT * .3f, Game.HEIGHT)));
-			while((text.overlaps(cls.get(i).bounds())) || (mbR.overlaps(cls.get(i).bounds()))) {
+			while((text.overlaps(cls.get(i).bounds())) ) {
 				cls.get(i).setPosition(MathUtils.random(Game.WIDTH), MathUtils.random(Game.HEIGHT * .3f, Game.HEIGHT));
 			}
 		}
@@ -94,7 +94,8 @@ public class PlayState extends GameState {
 			p = new Player(g, lJ, rJ, in, lS, rS);
 			break;
 		}
-		mb = new MenuButton(mbX, mbY);
+		Texture temp = new Texture("entities/buttons/menu.png");
+		mb = new MenuButton(Game.WIDTH - temp.getWidth(), Game.HEIGHT - temp.getHeight());
 		c = new Coin(p, MathUtils.random(Game.WIDTH), timer);
 		sr = new ShapeRenderer();
 		Game.res.getMusic("bgm").play();
@@ -151,22 +152,31 @@ public class PlayState extends GameState {
 		}
 		p.draw(sb, Gdx.graphics.getDeltaTime());
 		c.draw(sb);
-		String timeS = "Time Left: " + Long.toString(timer.getCurrentTime()) + " seconds";
+		float seconds = timer.getCurrentTime();
+		float minutes = seconds / 60;
+		float remainingSeconds = seconds % 60;
+		String timeS;
+		if(remainingSeconds >= 10) {
+			timeS = "Time Left: " +(int) minutes + ":" + (int) remainingSeconds;
+		} else {
+			timeS = "Time Left: " +(int) minutes + ":0" + (int) remainingSeconds;
+		}
 		float height = font.getBounds(timeS).height;
 		font.draw(sb, timeS, 0, Game.HEIGHT);
 		font.draw(sb, "Coins: " + c.coinString(), 0, Game.HEIGHT - height - 5);
-		sb.end();
 		switch(Gdx.app.getType()) {
 		case Android:
-			lJ.draw();rJ.draw(); rS.draw(); lS.draw();
+			lJ.draw(sb);rJ.draw(sb); rS.draw(sb); lS.draw(sb);
 			break;
 		case Desktop:
 			break;
 		}
-		mb.draw();
+		mb.draw(sb);
+		sb.end();
 		if(Game.debug) debugDraw();
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	public void debugDraw() {
 		pPos.set(p.getBounds().x, p.getBounds().y);
 		cPos.set(c.getBounds().x, c.getBounds().y);
@@ -178,6 +188,9 @@ public class PlayState extends GameState {
 		sr.setColor(MathUtils.random(), MathUtils.random(), MathUtils.random(), 1);
 		sr.rect(c.getBounds().x, c.getBounds().y, c.getBounds().width, c.getBounds().height);
 		sr.setColor(MathUtils.random(), MathUtils.random(), MathUtils.random(), 1);
+		sr.line(0, 0, mb.getX(), mb.getY());
+		System.out.println(mb.getX());
+		System.out.println(mb.getY());
 		sr.line(Game.WIDTH * .25f, 0, Game.WIDTH * .25f, Game.HEIGHT);
 		sr.line(Game.WIDTH * .5f, 0, Game.WIDTH * .5f, Game.HEIGHT);
 		sr.line(Game.WIDTH * .75f, 0, Game.WIDTH * .75f, Game.HEIGHT);
@@ -212,6 +225,14 @@ public class PlayState extends GameState {
 		font.draw(sb, cPosi, bWidth + pWidth + 10, cHeight);
 		font.draw(sb, iPosi, 0, Math.max(Math.max(bHeight, cHeight), pHeight) + iHeight);
 		sb.end();
+		switch(Gdx.app.getType()) {
+		case Android:
+			lJ.debug();rJ.debug(); rS.debug(); lS.debug();
+			break;
+		case Desktop:
+			break;
+		}
+		mb.debug();
 	}
 
 	@Override
